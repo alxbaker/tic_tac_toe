@@ -5,16 +5,6 @@ const playerFactory  = (marker) => {
   };
 };
 
-const displayControllerModule = (() => {
-  const cells = document.querySelectorAll('.cell');
-
-  cells.forEach((cell) => {
-    cell.addEventListener('click', () => {
-      gameControllerModule.takeTurn(cell);    
-    });
-  });
-})();
-
 const gameBoardModule =  (()  => {
   const places = ["", "", "", "", "", "", "", "", ""];
   
@@ -46,9 +36,23 @@ const gameBoardModule =  (()  => {
 })();
 
 const gameControllerModule = (() => {
-  const playerX = playerFactory('X');
-  const playerO = playerFactory('O');
-  let activePlayer = playerX;
+  let humanPlayer = undefined;
+  let computerPlayer = undefined;
+  let activePlayer = undefined;
+
+  const createPlayers = (marker) => {
+    if (humanPlayer === undefined && computerPlayer === undefined) {
+      humanPlayer = playerFactory(marker);
+      computerPlayer = playerFactory(marker === 'X' ? 'O' : 'X');
+      activePlayer = humanPlayer;
+    }
+    return {
+      humanPlayer,
+      computerPlayer,
+      activePlayer
+    }
+  }
+  
 
   const placeMarker = (cell, marker) => {
     // Get the cell index
@@ -74,7 +78,7 @@ const gameControllerModule = (() => {
   }
 
   const swithcActivePlayer = () => {
-    activePlayer == playerX ? (activePlayer = playerO) : (activePlayer = playerX);
+    activePlayer == humanPlayer ? (activePlayer = computerPlayer) : (activePlayer = humanPlayer);
   }
 
   const checkWinner = (marker) => {
@@ -112,12 +116,33 @@ const gameControllerModule = (() => {
   }
 
   const takeTurn = (cell) => {
-    marker = activePlayer.getMarker();
-    placeMarker(cell, marker);
+    if (activePlayer === undefined){
+      alert('Plese select your marker')
+    } else {
+      marker = activePlayer.getMarker();
+      placeMarker(cell, marker);
+    }
   }
 
   return {
-    takeTurn
+    takeTurn,
+    createPlayers
   }
 })();
 
+const displayControllerModule = (() => {
+  const cells = document.querySelectorAll('.cell');
+  const markerBtns = document.querySelectorAll('.marker');
+
+  cells.forEach((cell) => {
+    cell.addEventListener('click', () => {
+      gameControllerModule.takeTurn(cell);    
+    });
+  });
+
+  markerBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      gameControllerModule.createPlayers(btn.textContent);
+    });
+  });
+})();
