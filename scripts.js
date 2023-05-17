@@ -17,11 +17,28 @@ const displayControllerModule = (() => {
 
 const gameBoardModule =  (()  => {
   const places = ["", "", "", "", "", "", "", "", ""];
-  const setPlace = (index, marker) => places[index]  = marker;
+  
+  const setPlace = (index, marker) => {
+    places[index]  = marker;
+  };
+
   const getPlace = (index) => places[index];
+
+  const getPlayerPlaces = (marker) => {
+    let playerPlaces = [];
+    for (index in places) {
+      if (places[index] === marker) {
+        playerPlaces.push(parseInt(index));
+      }
+    }
+
+    return playerPlaces;
+  };
+
   return {
     setPlace,
-    getPlace
+    getPlace,
+    getPlayerPlaces
   };
 })();
 
@@ -43,7 +60,10 @@ const gameControllerModule = (() => {
       cell.textContent = marker;
 
       // Check if the player won
-      console.log('Winner? ',  checkWinner());
+      console.log('Winner? ',  checkWinner(marker));
+
+      // Check if there's a tie
+      console.log('Tie?', checkTie());
 
       // Switch the active player
       swithcActivePlayer();
@@ -54,7 +74,7 @@ const gameControllerModule = (() => {
     activePlayer == playerX ? (activePlayer = playerO) : (activePlayer = playerX);
   }
 
-  const checkWinner = () => {
+  const checkWinner = (marker) => {
     const winConditions = [
       [0, 1, 2],
       [3, 4, 5],
@@ -65,6 +85,18 @@ const gameControllerModule = (() => {
       [0, 4, 8],
       [2, 4, 6]
     ];
+
+    playerPlaces = gameBoardModule.getPlayerPlaces(marker);
+    for (condition in winConditions) {
+        if (isSubset(playerPlaces, winConditions[condition])) {
+          return true;
+        };
+    }
+    return false;
+  }
+
+  const isSubset = (array1, array2) => {
+    return array2.every((element) => array1.includes(element));
   }
 
   const checkTie = () => {
