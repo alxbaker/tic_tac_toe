@@ -1,7 +1,9 @@
-const playerFactory  = (marker) => {
+const playerFactory  = (marker, name) => {
   const getMarker = () => marker;
+  const getName  = () => name
   return {
-    getMarker
+    getMarker,
+    getName
   };
 };
 
@@ -11,6 +13,12 @@ const gameBoardModule =  (()  => {
   const setPlace = (index, marker) => {
     places[index]  = marker;
   };
+
+  const reset = () => {
+    for (let i = 0; i < places.length; i++) {
+      places[i] = "";
+    }
+  }
 
   const getPlace = (index) => places[index];
 
@@ -31,7 +39,8 @@ const gameBoardModule =  (()  => {
     setPlace,
     getPlace,
     getPlaces,
-    getPlayerPlaces
+    getPlayerPlaces,
+    reset
   };
 })();
 
@@ -40,10 +49,16 @@ const gameControllerModule = (() => {
   let computerPlayer = undefined;
   let activePlayer = undefined;
 
-  const createPlayers = (marker) => {
+  const reset = () => {
+    humanPlayer = undefined;
+    computerPlayer = undefined;
+    activePlayer = undefined;
+  }
+
+  const createPlayers = (marker, name) => {
     if (humanPlayer === undefined && computerPlayer === undefined) {
-      humanPlayer = playerFactory(marker);
-      computerPlayer = playerFactory(marker === 'X' ? 'O' : 'X');
+      humanPlayer = playerFactory(marker, name);
+      computerPlayer = playerFactory(marker === 'X' ? 'O' : 'X', "Computer");
       activePlayer = humanPlayer;
     }
     return {
@@ -126,13 +141,15 @@ const gameControllerModule = (() => {
 
   return {
     takeTurn,
-    createPlayers
+    createPlayers,
+    reset
   }
 })();
 
 const displayControllerModule = (() => {
   const cells = document.querySelectorAll('.cell');
-  const markerBtns = document.querySelectorAll('.marker');
+  const startBtn = document.querySelector('#start-btn');
+  const resetBtn = document.querySelector('#reset-btn');
 
   cells.forEach((cell) => {
     cell.addEventListener('click', () => {
@@ -140,9 +157,20 @@ const displayControllerModule = (() => {
     });
   });
 
-  markerBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      gameControllerModule.createPlayers(btn.textContent);
-    });
+  startBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    firstName = document.getElementById('first_name').value;
+    marker = document.querySelector('input[type=radio]:checked').value;
+    console.log(firstName);
+    console.log(marker);
+    gameControllerModule.createPlayers(marker, firstName);
+  });
+
+  resetBtn.addEventListener('click', (event) => {
+    gameBoardModule.reset();
+    gameControllerModule.reset();
+    cells.forEach((cell) => {
+      cell.textContent = "";
+    })
   });
 })();

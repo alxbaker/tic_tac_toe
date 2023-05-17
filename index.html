@@ -10,11 +10,21 @@
 </head>
 <body>
     <h1>Tic Tac Toe</h1>
-    <div>
-        <p>Select your marker: </p>
-        <button class="marker">X</button>
-        <button class="marker">O</button>
-    </div>
+    <form id="new-game-form">
+        <label for="first_name">Enter your name: </label>
+        <input type="text" id="first_name">
+            <div>
+                <input type="radio" id="X" name="marker" value="X" class="marker">
+                <label for="X">X</label>
+            </div>
+          
+            <div>
+                <input type="radio" id="O" name="marker" value="O" class="marker">
+                <label for="O">O</label>
+            </div>
+        <button type="submit" id="start-btn">Start</button>
+        <button type="reset" id="reset-btn">Restart</button>
+    </form>
     <div class="board">
         <div class="cell top left" data-index="0"></div>
         <div class="cell top center" data-index="1"></div>
