@@ -24,6 +24,8 @@ const gameBoardModule =  (()  => {
 
   const getPlace = (index) => places[index];
 
+  const getPlaces = () => places;
+
   const getPlayerPlaces = (marker) => {
     let playerPlaces = [];
     for (index in places) {
@@ -38,6 +40,7 @@ const gameBoardModule =  (()  => {
   return {
     setPlace,
     getPlace,
+    getPlaces,
     getPlayerPlaces
   };
 })();
@@ -62,8 +65,8 @@ const gameControllerModule = (() => {
       // Check if the player won
       console.log('Winner? ',  checkWinner(marker));
 
-      // Check if there's a tie
-      console.log('Tie?', checkTie());
+      // Board is full
+      console.log('Board Full?', boardFull());
 
       // Switch the active player
       swithcActivePlayer();
@@ -87,8 +90,8 @@ const gameControllerModule = (() => {
     ];
 
     playerPlaces = gameBoardModule.getPlayerPlaces(marker);
-    for (condition in winConditions) {
-        if (isSubset(playerPlaces, winConditions[condition])) {
+    for (condition of winConditions) {
+        if (isSubset(playerPlaces, condition)) {
           return true;
         };
     }
@@ -99,8 +102,13 @@ const gameControllerModule = (() => {
     return array2.every((element) => array1.includes(element));
   }
 
-  const checkTie = () => {
-  
+  const boardFull = () => {
+    for (place of gameBoardModule.getPlaces()) {
+      if (place.length ==0 ) {
+        return false;
+      }
+    }
+    return true;
   }
 
   const takeTurn = (cell) => {
