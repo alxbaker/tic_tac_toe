@@ -94,12 +94,28 @@ const gameControllerModule = (() => {
         displayControllerModule.sendResult(`It's a tie!`)
       }
 
-      // Switch the active player
-      swithcActivePlayer();
+      // Make computer move if turn is for human player
+      if (activePlayer == humanPlayer) {
+        switchActivePlayer();
+        makeComputerMove();
+      } else {
+        switchActivePlayer();
+      }
+
+   
     }
   }
 
-  const swithcActivePlayer = () => {
+  const makeComputerMove = () => {
+    for (const [index, place] of gameBoardModule.getPlaces().entries()) {
+      if (place.length == 0) {
+        placeMarker(displayControllerModule.getCellByIndex(index), activePlayer.getMarker());
+        break;
+      } 
+    };
+  }
+
+  const switchActivePlayer = () => {
     activePlayer == humanPlayer ? (activePlayer = computerPlayer) : (activePlayer = humanPlayer);
   }
 
@@ -130,7 +146,7 @@ const gameControllerModule = (() => {
 
   const boardFull = () => {
     for (place of gameBoardModule.getPlaces()) {
-      if (place.length ==0 ) {
+      if (place.length == 0) {
         return false;
       }
     }
@@ -187,7 +203,12 @@ const displayControllerModule = (() => {
     requestAnimationFrame(() => {requestAnimationFrame(() => {alert(message)})});
   }
 
+  function getCellByIndex(index) {
+    return document.querySelector(`[data-index = '${index}']`);
+  }
+
   return {
-    sendResult
+    sendResult,
+    getCellByIndex
   }
 })();
