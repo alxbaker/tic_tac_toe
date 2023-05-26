@@ -67,7 +67,6 @@ const gameControllerModule = (() => {
       activePlayer
     }
   }
-  
 
   const placeMarker = (cell, marker) => {
     // Get the cell index
@@ -82,10 +81,18 @@ const gameControllerModule = (() => {
       cell.textContent = marker;
 
       // Check if the player won
-      console.log('Winner? ',  checkWinner(marker));
+      if (checkWinner(marker)) {
+        if (activePlayer == humanPlayer) {
+          displayControllerModule.setMessageHeader(`Congrats ${activePlayer.getName()}! You won!`)
+        } else if (activePlayer == computerPlayer) {
+          displayControllerModule.setMessageHeader(`Aww you lost! Better luck next time.`)
+        }
+      }
 
       // Board is full
-      console.log('Board Full?', boardFull());
+      if (boardFull()) {
+        displayControllerModule.setMessageHeader(`It's a tie!`)
+      }
 
       // Switch the active player
       swithcActivePlayer();
@@ -150,6 +157,16 @@ const displayControllerModule = (() => {
   const cells = document.querySelectorAll('.cell');
   const startBtn = document.querySelector('#start-btn');
   const resetBtn = document.querySelector('#reset-btn');
+  const messageHeader = document.querySelector('h2');
+  const messageHeaderStr = 'Enter your name, select a marker, and click Start to begin.';
+  messageHeader.textContent = messageHeaderStr;
+
+  const reset = () => {
+    cells.forEach((cell) => {
+      cell.textContent = "";
+    })
+    setMessageHeader(messageHeaderStr, messageHeader)
+  }
 
   cells.forEach((cell) => {
     cell.addEventListener('click', () => {
@@ -161,16 +178,20 @@ const displayControllerModule = (() => {
     event.preventDefault();
     firstName = document.getElementById('first_name').value;
     marker = document.querySelector('input[type=radio]:checked').value;
-    console.log(firstName);
-    console.log(marker);
     gameControllerModule.createPlayers(marker, firstName);
   });
 
   resetBtn.addEventListener('click', (event) => {
     gameBoardModule.reset();
     gameControllerModule.reset();
-    cells.forEach((cell) => {
-      cell.textContent = "";
-    })
+    reset();
   });
+
+  function setMessageHeader(message) {
+    messageHeader.textContent = message;
+  }
+
+  return {
+    setMessageHeader
+  }
 })();
