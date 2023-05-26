@@ -72,8 +72,8 @@ const gameControllerModule = (() => {
     // Get the cell index
     cellIndex = parseInt(cell.dataset.index);
 
-    // Check that the space is open
-    if (cell.textContent.length === 0) {
+    // Check that the space is open and that there is no winner
+    if (cell.textContent.length === 0 && !checkWinner(computerPlayer.getMarker()) && !checkWinner(humanPlayer.getMarker())) {
       // Set array value to player marker
       gameBoardModule.setPlace(cellIndex, marker);
 
@@ -83,15 +83,15 @@ const gameControllerModule = (() => {
       // Check if the player won
       if (checkWinner(marker)) {
         if (activePlayer == humanPlayer) {
-          displayControllerModule.setMessageHeader(`Congrats ${activePlayer.getName()}! You won!`)
+          displayControllerModule.sendResult(`Congrats ${activePlayer.getName()}! You won!`)
         } else if (activePlayer == computerPlayer) {
-          displayControllerModule.setMessageHeader(`Aww you lost! Better luck next time.`)
+          displayControllerModule.sendResult(`Aww you lost! Better luck next time.`)
         }
       }
 
       // Board is full
-      if (boardFull()) {
-        displayControllerModule.setMessageHeader(`It's a tie!`)
+      if (boardFull() && !checkWinner(marker)) {
+        displayControllerModule.sendResult(`It's a tie!`)
       }
 
       // Switch the active player
@@ -157,15 +157,11 @@ const displayControllerModule = (() => {
   const cells = document.querySelectorAll('.cell');
   const startBtn = document.querySelector('#start-btn');
   const resetBtn = document.querySelector('#reset-btn');
-  const messageHeader = document.querySelector('h2');
-  const messageHeaderStr = 'Enter your name, select a marker, and click Start to begin.';
-  messageHeader.textContent = messageHeaderStr;
 
   const reset = () => {
     cells.forEach((cell) => {
       cell.textContent = "";
     })
-    setMessageHeader(messageHeaderStr, messageHeader)
   }
 
   cells.forEach((cell) => {
@@ -187,11 +183,11 @@ const displayControllerModule = (() => {
     reset();
   });
 
-  function setMessageHeader(message) {
-    messageHeader.textContent = message;
+  function sendResult(message) {
+    requestAnimationFrame(() => {requestAnimationFrame(() => {alert(message)})});
   }
 
   return {
-    setMessageHeader
+    sendResult
   }
 })();
